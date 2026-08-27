@@ -36,7 +36,7 @@ export interface DashboardData {
 }
 
 const emptyPlatformMap = (): Record<PlatformType, number> => ({
-  upwork: 0, guru: 0, freelancer: 0, linkedin: 0, referral: 0, other: 0,
+  upwork: 0, guru: 0, freelancer: 0, linkedin: 0, referral: 0, direct: 0, other: 0,
 });
 
 export async function getDashboardData(

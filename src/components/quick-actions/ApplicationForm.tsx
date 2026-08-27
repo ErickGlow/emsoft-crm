@@ -6,11 +6,18 @@ import { Button } from "@/components/ui/Button";
 import { Input, Label, Select, Textarea } from "@/components/ui/Input";
 import { useToast } from "@/components/ui/Toast";
 import { createClient } from "@/lib/supabase/client";
-import { PLATFORM_LABELS } from "@/lib/constants";
-import type { PlatformType } from "@/lib/database.types";
+import { PLATFORM_LABELS, APPLICATION_PLATFORMS, APPLICATION_STATUS_LABELS, APPLICATION_CREATE_STATUSES } from "@/lib/constants";
+import type { PlatformType, ApplicationStatus } from "@/lib/database.types";
+import { format } from "date-fns";
+
+function todayStr() {
+  return format(new Date(), "yyyy-MM-dd");
+}
 
 export function ApplicationForm({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [platform, setPlatform] = useState<PlatformType>("upwork");
+  const [status, setStatus] = useState<ApplicationStatus>("applied");
+  const [appliedDate, setAppliedDate] = useState(todayStr());
   const [jobTitle, setJobTitle] = useState("");
   const [clientName, setClientName] = useState("");
   const [jobUrl, setJobUrl] = useState("");
@@ -21,7 +28,8 @@ export function ApplicationForm({ open, onClose }: { open: boolean; onClose: () 
   const router = useRouter();
 
   function reset() {
-    setPlatform("upwork"); setJobTitle(""); setClientName(""); setJobUrl(""); setBudget(""); setNotes("");
+    setPlatform("upwork"); setStatus("applied"); setAppliedDate(todayStr());
+    setJobTitle(""); setClientName(""); setJobUrl(""); setBudget(""); setNotes("");
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -34,6 +42,11 @@ export function ApplicationForm({ open, onClose }: { open: boolean; onClose: () 
     } = await supabase.auth.getUser();
     if (!user) return;
 
+    // appliedDate is a plain yyyy-MM-dd from the date input — store it at
+    // local noon before converting to an ISO timestamp so timezone
+    // rounding near midnight can never shift it onto the wrong calendar day.
+    const appliedAtIso = new Date(`${appliedDate}T12:00:00`).toISOString();
+
     const { error } = await supabase.from("applications").insert({
       owner_id: user.id,
       platform,
@@ -41,8 +54,8 @@ export function ApplicationForm({ open, onClose }: { open: boolean; onClose: () 
       client_name: clientName.trim() || null,
       job_url: jobUrl.trim() || null,
       budget: budget ? Number(budget) : null,
-      applied_at: new Date().toISOString(),
-      status: "applied",
+      applied_at: appliedAtIso,
+      status,
       potential_value: budget ? Number(budget) : null,
       notes: notes.trim() || null,
     });
@@ -52,7 +65,7 @@ export function ApplicationForm({ open, onClose }: { open: boolean; onClose: () 
       push(`Couldn't save application: ${error.message}`, "error");
       return;
     }
-    push("Application saved");
+    push("Application saved — first follow-up scheduled automatically");
     reset();
     onClose();
     router.refresh();
@@ -76,7 +89,7 @@ export function ApplicationForm({ open, onClose }: { open: boolean; onClose: () 
         <div>
           <Label>Platform</Label>
           <Select value={platform} onChange={(e) => setPlatform(e.target.value as PlatformType)}>
-            {(["upwork", "guru", "freelancer", "other"] as const).map((p) => (
+            {APPLICATION_PLATFORMS.map((p) => (
               <option key={p} value={p}>{PLATFORM_LABELS[p]}</option>
             ))}
           </Select>
@@ -93,6 +106,20 @@ export function ApplicationForm({ open, onClose }: { open: boolean; onClose: () 
           <Label>Job URL (optional)</Label>
           <Input value={jobUrl} onChange={(e) => setJobUrl(e.target.value)} placeholder="https://upwork.com/jobs/…" />
         </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label>Status</Label>
+            <Select value={status} onChange={(e) => setStatus(e.target.value as ApplicationStatus)}>
+              {APPLICATION_CREATE_STATUSES.map((s) => (
+                <option key={s} value={s}>{APPLICATION_STATUS_LABELS[s]}</option>
+              ))}
+            </Select>
+          </div>
+          <div>
+            <Label>Applied date</Label>
+            <Input type="date" value={appliedDate} onChange={(e) => setAppliedDate(e.target.value)} />
+          </div>
+        </div>
         <div>
           <Label>Budget (optional)</Label>
           <Input value={budget} onChange={(e) => setBudget(e.target.value)} placeholder="5000" inputMode="decimal" />
@@ -101,6 +128,10 @@ export function ApplicationForm({ open, onClose }: { open: boolean; onClose: () 
           <Label>Notes (optional)</Label>
           <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Anything worth remembering…" />
         </div>
+        <p className="text-[11.5px] text-[var(--text-faint)]">
+          A step-1 follow-up will be scheduled automatically, based on the applied date above and your follow-up
+          intervals in Settings.
+        </p>
       </form>
     </Drawer>
   );

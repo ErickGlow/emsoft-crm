@@ -6,8 +6,13 @@ export const PLATFORM_LABELS: Record<PlatformType, string> = {
   freelancer: "Freelancer",
   linkedin: "LinkedIn",
   referral: "Referral",
+  direct: "Direct",
   other: "Other",
 };
+
+// Platform options offered specifically in the Add Application flow —
+// a curated subset/order of PlatformType, per product requirement.
+export const APPLICATION_PLATFORMS: PlatformType[] = ["upwork", "freelancer", "guru", "linkedin", "direct", "other"];
 
 export const APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
   applied: "Applied",
@@ -18,6 +23,13 @@ export const APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
   won: "Won",
   lost: "Lost",
 };
+
+// Statuses offered when CREATING an application — "Follow-up" is a
+// downstream state the follow-up engine transitions into, not something
+// you'd pick when first logging an application.
+export const APPLICATION_CREATE_STATUSES: ApplicationStatus[] = [
+  "applied", "replied", "interview", "proposal", "won", "lost",
+];
 
 export const APPLICATION_STATUS_COLORS: Record<ApplicationStatus, string> = {
   applied: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",

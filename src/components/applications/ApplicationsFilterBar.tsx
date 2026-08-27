@@ -1,7 +1,7 @@
 "use client";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Select } from "@/components/ui/Input";
-import { PLATFORM_LABELS, APPLICATION_STATUS_LABELS } from "@/lib/constants";
+import { PLATFORM_LABELS, APPLICATION_STATUS_LABELS, APPLICATION_PLATFORMS } from "@/lib/constants";
 
 export function ApplicationsFilterBar() {
   const router = useRouter();
@@ -23,7 +23,7 @@ export function ApplicationsFilterBar() {
         onChange={(e) => update("platform", e.target.value)}
       >
         <option value="">All platforms</option>
-        {(["upwork", "guru", "freelancer", "other"] as const).map((p) => (
+        {APPLICATION_PLATFORMS.map((p) => (
           <option key={p} value={p}>{PLATFORM_LABELS[p]}</option>
         ))}
       </Select>

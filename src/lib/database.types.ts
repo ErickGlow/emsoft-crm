@@ -3,7 +3,7 @@
 // if the schema drifts from this file.
 
 export type UserRole = "admin" | "viewer";
-export type PlatformType = "upwork" | "guru" | "freelancer" | "linkedin" | "referral" | "other";
+export type PlatformType = "upwork" | "guru" | "freelancer" | "linkedin" | "referral" | "direct" | "other";
 export type ApplicationStatus = "applied" | "followup" | "replied" | "interview" | "proposal" | "won" | "lost";
 export type LinkedinActivityType = "post" | "comment" | "message" | "followup";
 export type ReplyStatus = "no_reply" | "replied";
