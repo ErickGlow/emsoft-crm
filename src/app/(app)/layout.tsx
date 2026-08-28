@@ -4,6 +4,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
 import { ToastProvider } from "@/components/ui/Toast";
 import { ProfileProvider } from "@/lib/context/ProfileContext";
+import { getActiveLinkedInConversations } from "@/lib/data/linkedin-conversations";
 import type { Profile } from "@/lib/database.types";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -31,9 +32,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }
 
   const today = new Date().toISOString().slice(0, 10);
-  const [{ count: overdue }, { count: dueToday }] = await Promise.all([
+  const [{ count: overdue }, { count: dueToday }, conversations] = await Promise.all([
     supabase.from("followups").select("id", { count: "exact", head: true }).eq("status", "scheduled").lt("due_date", today),
     supabase.from("followups").select("id", { count: "exact", head: true }).eq("status", "scheduled").eq("due_date", today),
+    getActiveLinkedInConversations(supabase),
   ]);
 
   return (
@@ -42,7 +44,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <div className="flex min-h-screen">
           <Sidebar />
           <div className="flex-1 flex flex-col min-w-0">
-            <Topbar profile={profile} overdue={overdue ?? 0} dueToday={dueToday ?? 0} />
+            <Topbar profile={profile} overdue={overdue ?? 0} dueToday={dueToday ?? 0} conversations={conversations} />
             <main className="flex-1 px-4 md:px-6 py-6 max-w-[1400px] w-full mx-auto">{children}</main>
           </div>
         </div>
