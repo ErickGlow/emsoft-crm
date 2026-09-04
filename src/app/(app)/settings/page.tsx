@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { SettingsForm } from "@/components/settings/SettingsForm";
+import { DigestTestCard } from "@/components/settings/DigestTestCard";
 import type { FollowupSettings, Profile } from "@/lib/database.types";
 
 export default async function SettingsPage() {
@@ -30,6 +31,9 @@ export default async function SettingsPage() {
         currency={profile?.currency ?? "USD"}
         ownerId={adminProfile?.id ?? user!.id}
       />
+      <div className="max-w-2xl">
+        <DigestTestCard />
+      </div>
     </div>
   );
 }

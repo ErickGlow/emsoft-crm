@@ -9,13 +9,15 @@ import { CallForm } from "./CallForm";
 import { ProposalForm } from "./ProposalForm";
 import { WonForm } from "./WonForm";
 import { ManualFollowupForm } from "./ManualFollowupForm";
+import { PostForm } from "./PostForm";
 
-type ActionKey = "application" | "linkedin" | "contact" | "call" | "proposal" | "won" | "followup" | null;
+type ActionKey = "application" | "linkedin" | "contact" | "call" | "proposal" | "won" | "followup" | "post" | null;
 
 const actions: { key: Exclude<ActionKey, null>; label: string; icon: typeof IconPlus }[] = [
   { key: "application", label: "Application", icon: IconBriefcase },
   { key: "followup", label: "Follow-up", icon: IconClock },
   { key: "linkedin", label: "LinkedIn", icon: IconLinkedin },
+  { key: "post", label: "Post", icon: IconFileText },
   { key: "contact", label: "Contact / Lead", icon: IconUsers },
   { key: "call", label: "Call", icon: IconPhone },
   { key: "proposal", label: "Proposal", icon: IconFileText },
@@ -50,6 +52,7 @@ export function QuickActionBar() {
       <ProposalForm open={active === "proposal"} onClose={() => setActive(null)} />
       <WonForm open={active === "won"} onClose={() => setActive(null)} />
       <ManualFollowupForm open={active === "followup"} onClose={() => setActive(null)} />
+      <PostForm open={active === "post"} onClose={() => setActive(null)} />
     </>
   );
 }
