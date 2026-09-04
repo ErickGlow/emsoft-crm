@@ -163,6 +163,33 @@ type TableDef<Row, Insert, Update = Partial<Insert>> = {
   Relationships: [];
 };
 
+export type PostStatus = "pending" | "approved";
+export type AttentionMessageStatus = "waiting" | "resolved";
+
+export type Post = {
+  id: string;
+  owner_id: string;
+  content: string;
+  status: PostStatus;
+  approved_at: string | null;
+  approved_by: string | null;
+  created_at: string;
+};
+
+export type AttentionMessage = {
+  id: string;
+  owner_id: string;
+  person_name: string;
+  company: string | null;
+  message_text: string;
+  conversation_url: string | null;
+  notes: string | null;
+  status: AttentionMessageStatus;
+  resolved_at: string | null;
+  resolved_by: string | null;
+  created_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -176,6 +203,16 @@ export type Database = {
       proposals: TableDef<Proposal, Omit<Proposal, "id" | "created_at">>;
       deals: TableDef<Deal, Omit<Deal, "id" | "created_at">>;
       activity_log: TableDef<ActivityLogEntry, Omit<ActivityLogEntry, "id">>;
+      posts: TableDef<
+        Post,
+        Omit<Post, "id" | "created_at" | "status" | "approved_at" | "approved_by">,
+        Partial<Pick<Post, "status" | "approved_at" | "approved_by">>
+      >;
+      attention_messages: TableDef<
+        AttentionMessage,
+        Omit<AttentionMessage, "id" | "created_at" | "status" | "resolved_at" | "resolved_by">,
+        Partial<Pick<AttentionMessage, "status" | "resolved_at" | "resolved_by">>
+      >;
     };
     Views: Record<string, never>;
     Functions: {
@@ -187,6 +224,9 @@ export type Database = {
         Args: { p_owner_type: FollowupOwnerType; p_contact_id: string | null; p_application_id: string | null };
         Returns: Followup;
       };
+      approve_post: { Args: { p_post_id: string }; Returns: Post };
+      edit_pending_post: { Args: { p_post_id: string; p_content: string }; Returns: Post };
+      resolve_attention_message: { Args: { p_message_id: string }; Returns: AttentionMessage };
     };
   };
 };

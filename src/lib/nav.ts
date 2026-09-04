@@ -1,6 +1,6 @@
 import {
   IconDashboard, IconBriefcase, IconLinkedin, IconClock, IconUsers,
-  IconKanban, IconChart, IconSettings,
+  IconKanban, IconChart, IconSettings, IconFileText, IconMessage,
 } from "@/components/icons";
 
 export const NAV_SECTIONS = [
@@ -13,6 +13,8 @@ export const NAV_SECTIONS = [
     items: [
       { href: "/applications", label: "Applications", icon: IconBriefcase },
       { href: "/linkedin", label: "LinkedIn", icon: IconLinkedin },
+      { href: "/posts", label: "Posts for Approval", icon: IconFileText },
+      { href: "/messages", label: "Messages Awaiting Reply", icon: IconMessage },
       { href: "/followups", label: "Follow-ups", icon: IconClock },
     ],
   },
